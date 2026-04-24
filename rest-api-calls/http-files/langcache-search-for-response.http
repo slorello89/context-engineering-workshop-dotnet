@@ -1,0 +1,19 @@
+@baseUrl = langcache-base-url
+@apiKey = langcache-api-key
+@cacheId = langcache-cache-id
+@userId = user-2bfc7e6e-452f-40d6-b7e7-29855518B052
+
+POST {{baseUrl}}/v1/caches/{{cacheId}}/entries/search
+Authorization: Bearer {{apiKey}}
+Content-Type: application/json
+
+{
+  "prompt": "What is the color I like the most?",
+  "similarityThreshold": 0.85,
+  "attributes": {
+    "userId": "{{userId}}"
+  },
+  "searchStrategies": [
+    "semantic"
+  ]
+}

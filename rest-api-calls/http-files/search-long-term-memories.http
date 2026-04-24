@@ -1,0 +1,19 @@
+@agentMemoryServerUrl = http://localhost:8000
+@userId = user-2bfc7e6e-452f-40d6-b7e7-29855518B052
+
+POST {{agentMemoryServerUrl}}/v1/long-term-memory/search?optimize_query=false
+Content-Type: application/json
+
+{
+  "session_id": {
+    "eq": "{{userId}}"
+  },
+  "namespace": {
+    "any": [
+      "short-term-memory",
+      "long-term-memory"
+    ]
+  },
+  "text": "What is my favorite programming language?",
+  "limit": 5
+}

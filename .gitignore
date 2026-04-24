@@ -1,0 +1,37 @@
+target/
+
+### IntelliJ IDEA ###
+.idea
+
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### Mac OS ###
+.DS_Store
+
+### Others ###
+data
+.env
+backend-layer/.idea
+backend-layer/.env
+backend-layer/target
+frontend-layer/node_modules/

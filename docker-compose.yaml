@@ -1,0 +1,91 @@
+services:
+  redis-agent-memory-server:
+    container_name: redis-agent-memory-server
+    hostname: redis-agent-memory-server
+    image: redislabs/agent-memory-server:0.13.2
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_URL=redis://redis-database:6379
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - DISABLE_AUTH=false
+    command: agent-memory api --host 0.0.0.0 --port 8000 --task-backend=asyncio
+    depends_on:
+      - redis-database
+
+  redis-database:
+    container_name: redis-database
+    hostname: redis-database
+    image: redis:8.6.0
+    volumes:
+      - ./data:/data
+    environment:
+      REDIS_ARGS: --save 30 1
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
+      interval: 10s
+      retries: 5
+      start_period: 5s
+      timeout: 5s
+
+  redis-insight:
+    container_name: redis-insight
+    hostname: redis-insight
+    image: redis/redisinsight:3.0.2
+    depends_on:
+      - redis-database
+    environment:
+      RI_REDIS_HOST: "redis-database"
+      RI_REDIS_PORT: "6379"
+    ports:
+      - "5540:5540"
+    healthcheck:
+      test: ["CMD", "sh", "-c", "wget -q -O- http://redis-insight:5540/api/health | grep -q '\"status\":\"up\"'"]
+      interval: 10s
+      retries: 5
+      start_period: 5s
+      timeout: 5s
+
+  # backend-layer:
+  #   build:
+  #     context: ./backend-layer
+  #     dockerfile: Dockerfile
+  #   container_name: backend-layer
+  #   hostname: backend-layer
+  #   image: backend-layer:latest
+  #   depends_on:
+  #     - redis-agent-memory-server
+  #   ports:
+  #     - "8080:8080"
+  #   healthcheck:
+  #     test: "curl --fail --silent http://localhost:8080/actuator/health | grep -q '\"status\":\"UP\"' || exit 1"
+  #     interval: 10s
+  #     retries: 5
+  #     start_period: 5s
+  #     timeout: 5s
+  #   environment:
+  #     - OPENAI_API_KEY=${OPENAI_API_KEY}
+  #     - AGENT_MEMORY_SERVER_URL=http://redis-agent-memory-server:8000
+  #     - REDIS_LANGCACHE_SERVICE_BASEURL=${REDIS_LANGCACHE_SERVICE_BASEURL}
+  #     - REDIS_LANGCACHE_SERVICE_APIKEY=${REDIS_LANGCACHE_SERVICE_APIKEY}
+  #     - REDIS_LANGCACHE_SERVICE_CACHEID=${REDIS_LANGCACHE_SERVICE_CACHEID}
+
+  frontend-layer:
+    build:
+      context: frontend-layer
+      dockerfile: Dockerfile
+    container_name: frontend-layer
+    hostname: frontend-layer
+    image: frontend-layer:latest
+    # depends_on:
+    #   - backend-layer
+    ports:
+      - "3000:80"
+    healthcheck:
+      test: curl --fail http://localhost || exit 1
+      interval: 10s
+      retries: 5
+      start_period: 5s
+      timeout: 5s

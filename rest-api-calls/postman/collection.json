@@ -1,0 +1,205 @@
+{
+  "info": {
+    "_postman_id": "0baec35e-e4be-4997-ad4c-52df4e489877",
+    "name": "Context Engineering with LangChain4j Workshop",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "22745903"
+  },
+  "item": [
+    {
+      "name": "redis-langcache-create-entry",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{redis-langcache-apikey}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"prompt\": \"What is my favorite color?\",\n  \"response\": \"My favorite color is black\",\n  \"attributes\": {\n    \"userId\": \"user-2bfc7e6e-452f-40d6-b7e7-29855518B052\"\n  },\n  \"ttlMillis\": 60000\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{redis-langcache-baseurl}}/v1/caches/{{redis-langcache-cacheid}}/entries",
+          "host": [
+            "{{redis-langcache-baseurl}}"
+          ],
+          "path": [
+            "v1",
+            "caches",
+            "{{redis-langcache-cacheid}}",
+            "entries"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "redis-langcache-search-entries",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{redis-langcache-apikey}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"prompt\": \"What is my favorite color?\",\n  \"similarityThreshold\": 0.85,\n  \"attributes\": {\n    \"userId\": \"user-2bfc7e6e-452f-40d6-b7e7-29855518B052\"\n  },\n  \"searchStrategies\": [\n    \"semantic\"\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{redis-langcache-baseurl}}/v1/caches/{{redis-langcache-cacheid}}/entries/search",
+          "host": [
+            "{{redis-langcache-baseurl}}"
+          ],
+          "path": [
+            "v1",
+            "caches",
+            "{{redis-langcache-cacheid}}",
+            "entries",
+            "search"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "create-long-term-memory",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"memories\": [\n    {\n      \"id\": \"user-2bfc7e6e-452f-40d6-b7e7-29855518B052\",\n      \"session_id\": \"user-2bfc7e6e-452f-40d6-b7e7-29855518B052\",\n      \"text\": \"My favorite programming language is Java\",\n      \"namespace\": \"long-term-memory\",\n      \"memory_type\": \"semantic\"\n    }\n  ]\n}\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{agent-memory-server-url}}/v1/long-term-memory/",
+          "host": [
+            "{{agent-memory-server-url}}"
+          ],
+          "path": [
+            "v1",
+            "long-term-memory",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "search-long-term-memories",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"session_id\": {\n    \"eq\": \"user-2bfc7e6e-452f-40d6-b7e7-29855518B052\"\n  },\n  \"namespace\": {\n    \"any\": [\n      \"short-term-memory\",\n      \"long-term-memory\"\n    ]\n  },\n  \"text\": \"What is my favorite programming language?\",\n  \"limit\": 5\n}\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{agent-memory-server-url}}/v1/long-term-memory/search?optimize_query=false",
+          "host": [
+            "{{agent-memory-server-url}}"
+          ],
+          "path": [
+            "v1",
+            "long-term-memory",
+            "search"
+          ],
+          "query": [
+            {
+              "key": "optimize_query",
+              "value": "false"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "redis-langcache-baseurl",
+      "value": ""
+    },
+    {
+      "key": "redis-langcache-apikey",
+      "value": ""
+    },
+    {
+      "key": "redis-langcache-cacheid",
+      "value": ""
+    },
+    {
+      "key": "agent-memory-server-url",
+      "value": ""
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "name": "context-engineering-workshop-java",
+  "dockerComposeFile": [
+    "docker-compose.yml"
+  ],
+  "service": "workspace",
+  "workspaceFolder": "/workspaces/context-engineering-workshop-java",
+  "remoteUser": "vscode",
+  "updateRemoteUserUID": true,
+  "runServices": [
+    "workspace",
+    "redis-database",
+    "redis-agent-memory-server",
+    "redis-insight"
+  ],
+  "shutdownAction": "stopCompose",
+  "hostRequirements": {
+    "cpus": 6,
+    "memory": "8gb",
+    "storage": "32gb"
+  },
+  "forwardPorts": [
+    3000,
+    8080,
+    8000,
+    5540,
+    6379
+  ],
+  "portsAttributes": {
+    "3000": {
+      "label": "Frontend"
+    },
+    "8080": {
+      "label": "Backend API"
+    },
+    "8000": {
+      "label": "Agent Memory Server"
+    },
+    "5540": {
+      "label": "Redis Insight"
+    },
+    "6379": {
+      "label": "Redis"
+    }
+  },
+  "remoteEnv": {
+    "AGENT_MEMORY_SERVER_URL": "http://redis-agent-memory-server:8000"
+  },
+  "postCreateCommand": "bash .devcontainer/scripts/ensure-cache-permissions.sh vscode && cd frontend-layer && npm ci && cd ../backend-layer && ./mvnw -q -DskipTests dependency:go-offline",
+  "postStartCommand": "bash .devcontainer/scripts/ensure-cache-permissions.sh vscode",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "vmware.vscode-spring-boot",
+        "redhat.vscode-xml",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ]
+    }
+  }
+}

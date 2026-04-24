@@ -1,0 +1,162 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* IMPORTANT: Check App.css and index.html for any extra margin/padding on #root or body! */
+
+.chatbot-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Anchor content to top left */
+    justify-content: flex-start; /* Anchor content to top */
+    width: 100vw;
+    height: 100vh;
+    background-color: #163341;
+    padding: 0 0 30px 0; /* Ensure no top padding */
+    box-sizing: border-box;
+}
+
+.chat-header {
+    width: 100%;
+    max-width: none;
+    margin: -16px 0 0 -40px; /* Move header 16px higher and 40px to the left */
+    padding: 0;
+    display: flex;
+    justify-content: flex-start; /* Align items to the left */
+    align-items: flex-start; /* Align items to the top */
+    /* Remove any top margin or padding to minimize space above logo */
+}
+
+.chat-logo {
+    width: 360px; /* Twice as big as before */
+    height: auto;
+    max-width: 100%;
+    max-height: 200px;
+    object-fit: contain;
+    display: block;
+    margin: 0;
+    padding: 0;
+    /* Remove any top margin or padding to minimize space above logo */
+}
+
+.breadcrumb {
+    color: #888;
+    font-size: 14px;
+    align-self: flex-end;
+    margin-left: 16px;
+}
+
+.chatbox {
+    background-color: white;
+    width: calc(100vw - 100px);
+    max-width: none;
+    height: 70vh;
+    border-radius: 10px;
+    overflow-y: scroll;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0 auto 0 auto; /* No top margin */
+    margin-top: -30px; /* Pull chatbox up by 30px to further minimize space */
+}
+
+.message-container {
+    display: flex;
+    align-items: flex-start;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.message {
+    max-width: 80%;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 16px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    margin: 5px 0;
+}
+
+.message.user {
+    align-self: flex-end;
+    background-color: #FF4438;
+    color: white;
+    order: 2;
+}
+
+.message.ai {
+    align-self: flex-start;
+    background-color: #e6e6e6;
+    color: black;
+}
+
+.message.ai .elapsed-time {
+    display: inline-block;
+    margin-left: 8px;
+    font-size: 14px;
+    color: #888;
+    vertical-align: baseline;
+    font-family: inherit;
+    top: -4px;
+}
+
+.elapsed-time-below {
+    margin-top: -5px;
+    margin-left: 0;
+    font-size: 13px;
+    color: #888;
+    text-align: left;
+    padding-left: 12px;
+}
+
+.input-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: calc(100vw - 60px);
+    max-width: none;
+    margin: 20px auto 0 auto; /* Only top margin for spacing above input */
+    padding: 0;
+}
+
+.input-container input[type="text"] {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box;
+    margin-right: 10px;
+}
+
+.input-container button {
+    flex: 0 0 auto;
+    background-color: #FF4438;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.input-container button:hover {
+    background-color: #5548c8;
+}
+
+.input-container button:active {
+    background-color: #41359d;
+}

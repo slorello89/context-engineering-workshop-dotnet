@@ -1,0 +1,17 @@
+@baseUrl = langcache-base-url
+@apiKey = langcache-api-key
+@cacheId = langcache-cache-id
+@userId = user-2bfc7e6e-452f-40d6-b7e7-29855518B052
+
+POST {{baseUrl}}/v1/caches/{{cacheId}}/entries
+Authorization: Bearer {{apiKey}}
+Content-Type: application/json
+
+{
+  "prompt": "What is my favorite color?",
+  "response": "My favorite color is black",
+  "attributes": {
+    "userId": "{{userId}}"
+  },
+  "ttlMillis": 60000
+}
