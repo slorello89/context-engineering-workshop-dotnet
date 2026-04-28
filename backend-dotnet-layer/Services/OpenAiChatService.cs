@@ -78,6 +78,8 @@ public sealed class OpenAiChatService
     private readonly WorkingMemoryOptions _workingMemoryOptions;
     private readonly WorkingMemoryStore _workingMemoryStore;
     private readonly RetrievalAugmentorService _retrievalAugmentorService;
+    private readonly ChatHistoryWindowingService _chatHistoryWindowingService;
+    private readonly ResponseSemanticCacheService _responseSemanticCacheService;
 
     public OpenAiChatService(
         IOptions<OpenAiOptions> options,
@@ -85,6 +87,8 @@ public sealed class OpenAiChatService
         IOptions<WorkingMemoryOptions> workingMemoryOptions,
         WorkingMemoryStore workingMemoryStore,
         RetrievalAugmentorService retrievalAugmentorService,
+        ChatHistoryWindowingService chatHistoryWindowingService,
+        ResponseSemanticCacheService responseSemanticCacheService,
         IChatCompletionService? chatCompletionService = null)
     {
         _options = options.Value;
@@ -92,6 +96,8 @@ public sealed class OpenAiChatService
         _workingMemoryOptions = workingMemoryOptions.Value;
         _workingMemoryStore = workingMemoryStore;
         _retrievalAugmentorService = retrievalAugmentorService;
+        _chatHistoryWindowingService = chatHistoryWindowingService;
+        _responseSemanticCacheService = responseSemanticCacheService;
         _chatCompletionService = chatCompletionService;
     }
 
@@ -120,12 +126,27 @@ public sealed class OpenAiChatService
             _workingMemoryStore,
             cancellationToken);
 
+        var cachedResponse = await _responseSemanticCacheService.TryGetResponseAsync(
+            query,
+            resolvedSessionId,
+            cancellationToken);
+
+        if (!string.IsNullOrWhiteSpace(cachedResponse))
+        {
+            await workingMemoryChat.AddAsync(new ChatMessageContent(AuthorRole.User, query), cancellationToken);
+            await workingMemoryChat.AddAsync(new ChatMessageContent(AuthorRole.Assistant, cachedResponse), cancellationToken);
+            return cachedResponse;
+        }
+
         var augmentedUserMessage = await _retrievalAugmentorService.AugmentUserMessageAsync(
             query,
             resolvedSessionId,
             cancellationToken);
 
-        var history = workingMemoryChat.ToChatHistory(SystemPrompt);
+        var history = _chatHistoryWindowingService.BuildWindowedHistory(
+            SystemPrompt,
+            workingMemoryChat.Messages,
+            augmentedUserMessage);
         history.AddUserMessage(augmentedUserMessage);
 
         var executionSettings = new OpenAIPromptExecutionSettings
@@ -147,6 +168,7 @@ public sealed class OpenAiChatService
 
             await workingMemoryChat.AddAsync(new ChatMessageContent(AuthorRole.User, query), cancellationToken);
             await workingMemoryChat.AddAsync(new ChatMessageContent(AuthorRole.Assistant, content), cancellationToken);
+            await _responseSemanticCacheService.StoreResponseAsync(query, content, resolvedSessionId, cancellationToken);
             return content;
         }
         catch (Exception exception)
