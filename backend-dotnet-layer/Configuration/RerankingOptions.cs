@@ -5,10 +5,10 @@ public sealed class RerankingOptions
     public const string SectionName = "Reranking";
 
     public string ModelPath { get; init; } =
-        "../backend-layer/src/main/resources/ms-marco-MiniLM-L-6/model.onnx";
+        "Assets/ms-marco-MiniLM-L-6/model.onnx";
 
     public string TokenizerPath { get; init; } =
-        "../backend-layer/src/main/resources/ms-marco-MiniLM-L-6/tokenizer.json";
+        "Assets/ms-marco-MiniLM-L-6/tokenizer.json";
 
     public int MaxSequenceLength { get; init; } = 512;
 

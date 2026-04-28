@@ -1,6 +1,6 @@
 ## 🏆 Congratulations!
 
-You've successfully assembled the Context Engineering Workshop for .NET Developers and built an AI application that demonstrates practical context-management patterns for Large Language Models (LLMs). This version of the project includes the original workshop assets plus a separate ASP.NET Core and Semantic Kernel backend scaffold.
+You've successfully assembled the Context Engineering Workshop for .NET Developers and built an AI application that demonstrates practical context-management patterns for Large Language Models (LLMs). This repository is now focused on the ASP.NET Core and Semantic Kernel implementation.
 
 ## .NET Scaffold
 
@@ -14,7 +14,7 @@ cd ..
 dotnet run --project backend-dotnet-layer
 ```
 
-The original workshop `docker-compose.yaml` is left intact for the existing Java/Redis stack. The .NET app runs separately on `http://localhost:8081` by default so it does not collide with the Java backend on `8080`.
+The repository now runs only the Redis support services through `docker-compose.yaml`. The .NET app runs separately on `http://localhost:8081` by default.
 
 ## 🎯 What You've Built
 

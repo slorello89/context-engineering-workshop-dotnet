@@ -1,10 +1,10 @@
 {
-  "name": "context-engineering-workshop-java",
+  "name": "context-engineering-workshop-dotnet",
   "dockerComposeFile": [
     "docker-compose.yml"
   ],
   "service": "workspace",
-  "workspaceFolder": "/workspaces/context-engineering-workshop-java",
+  "workspaceFolder": "/workspaces/context-engineering-workshop-dotnet",
   "remoteUser": "vscode",
   "updateRemoteUserUID": true,
   "runServices": [
@@ -46,14 +46,13 @@
   "remoteEnv": {
     "AGENT_MEMORY_SERVER_URL": "http://redis-agent-memory-server:8000"
   },
-  "postCreateCommand": "bash .devcontainer/scripts/ensure-cache-permissions.sh vscode && cd frontend-layer && npm ci && cd ../backend-layer && ./mvnw -q -DskipTests dependency:go-offline",
+  "postCreateCommand": "bash .devcontainer/scripts/ensure-cache-permissions.sh vscode && cd frontend-layer && npm ci && cd ../backend-dotnet-layer && dotnet restore",
   "postStartCommand": "bash .devcontainer/scripts/ensure-cache-permissions.sh vscode",
   "customizations": {
     "vscode": {
       "extensions": [
-        "vscjava.vscode-java-pack",
-        "vmware.vscode-spring-boot",
-        "redhat.vscode-xml",
+        "ms-dotnettools.csdevkit",
+        "ms-dotnettools.csharp",
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode"
       ]

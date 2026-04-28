@@ -47,31 +47,6 @@ services:
       retries: 5
       start_period: 5s
       timeout: 5s
-
-  # backend-layer:
-  #   build:
-  #     context: ./backend-layer
-  #     dockerfile: Dockerfile
-  #   container_name: backend-layer
-  #   hostname: backend-layer
-  #   image: backend-layer:latest
-  #   depends_on:
-  #     - redis-agent-memory-server
-  #   ports:
-  #     - "8080:8080"
-  #   healthcheck:
-  #     test: "curl --fail --silent http://localhost:8080/actuator/health | grep -q '\"status\":\"UP\"' || exit 1"
-  #     interval: 10s
-  #     retries: 5
-  #     start_period: 5s
-  #     timeout: 5s
-  #   environment:
-  #     - OPENAI_API_KEY=${OPENAI_API_KEY}
-  #     - AGENT_MEMORY_SERVER_URL=http://redis-agent-memory-server:8000
-  #     - REDIS_LANGCACHE_SERVICE_BASEURL=${REDIS_LANGCACHE_SERVICE_BASEURL}
-  #     - REDIS_LANGCACHE_SERVICE_APIKEY=${REDIS_LANGCACHE_SERVICE_APIKEY}
-  #     - REDIS_LANGCACHE_SERVICE_CACHEID=${REDIS_LANGCACHE_SERVICE_CACHEID}
-
   frontend-layer:
     build:
       context: frontend-layer
@@ -79,8 +54,6 @@ services:
     container_name: frontend-layer
     hostname: frontend-layer
     image: frontend-layer:latest
-    # depends_on:
-    #   - backend-layer
     ports:
       - "3000:80"
     healthcheck:
