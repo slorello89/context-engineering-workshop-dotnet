@@ -1,36 +1,72 @@
-## 🏆 Congratulations!
+## Context Engineering Workshop for .NET
 
-You've successfully assembled the Context Engineering Workshop for .NET Developers and built an AI application that demonstrates practical context-management patterns for Large Language Models (LLMs). This repository is now focused on the ASP.NET Core and Semantic Kernel implementation.
+This repository contains the ASP.NET Core / Semantic Kernel version of the Context Engineering Workshop. The Java backend has been removed from this repo; the workshop is now organized around the dotnet implementation in `backend-dotnet-layer/`.
 
-## .NET Scaffold
+`main` is the completed reference implementation. Participants should normally work through the lab branches instead of starting from `main`.
 
-This repo now also includes a minimal ASP.NET Core version in `backend-dotnet-layer/`. It implements only the chat endpoint used by the React UI and serves the built frontend from the .NET app itself.
+## Workshop Flow
+
+Each lab now has both a `starter` branch and a `solution` branch:
+
+| Lab | Starter | Solution | Focus |
+| --- | --- | --- | --- |
+| 1 | `lab-1-starter` | `lab-1-solution` | Base app setup |
+| 2 | `lab-2-starter` | `lab-2-solution` | Short-term memory |
+| 3 | `lab-3-starter` | `lab-3-solution` | PDF ingestion and knowledge-base storage |
+| 4 | `lab-4-starter` | `lab-4-solution` | Basic RAG with knowledge-base retrieval |
+| 5 | `lab-5-starter` | `lab-5-solution` | Long-term user memory retrieval |
+| 6 | `lab-6-starter` | `lab-6-solution` | Query compression and reranking |
+| 7 | `lab-7-starter` | `lab-7-solution` | Few-shot prompting |
+| 8 | `lab-8-starter` | `lab-8-solution` | Token-window management |
+| 9 | `lab-9-starter` | `lab-9-solution` | Semantic caching |
+
+How to use the branches:
+
+1. Check out `lab-N-starter`.
+2. Follow that branch `README.md` and add the code described there.
+3. Compare your result with `lab-N-solution`.
+4. Move on to `lab-(N+1)-starter`.
+
+## Running the App
+
+The repository runs Redis support services through `docker-compose.yaml`. The ASP.NET Core backend runs separately and serves the built React frontend.
 
 ```bash
 docker compose up -d
-export OPENAI_API_KEY=your-key
-cd frontend-layer && npm run build
+cd frontend-layer
+npm install
+npm run build
 cd ..
 dotnet run --project backend-dotnet-layer
 ```
 
-The repository now runs only the Redis support services through `docker-compose.yaml`. The .NET app runs separately on `http://localhost:8081` by default.
+Default endpoints:
 
-## Lab Branches
+- frontend and API via ASP.NET Core: `http://localhost:8081`
+- health endpoint: `http://localhost:8081/health`
+- Redis Insight: `http://localhost:5540`
 
-The workshop starter checkpoints now live on branch-per-lab snapshots:
+Environment setup:
 
-- `lab-1-starter`
-- `lab-2-starter`
-- `lab-3-starter`
-- `lab-4-starter`
-- `lab-5-starter`
-- `lab-6-starter`
-- `lab-7-starter`
-- `lab-8-starter`
-- `lab-9-starter`
+```bash
+cp .env.example .env
+```
 
-Each branch mirrors the Java workshop progression, adapted to the ASP.NET Core / Semantic Kernel version of the project. The completed reference implementation remains on `main`.
+At minimum, set:
+
+```bash
+OPENAI_API_KEY=your-openai-api-key
+AGENT_MEMORY_SERVER_URL=http://localhost:8000
+```
+
+The backend automatically loads the repo-root `.env` file when it starts.
+
+## Repo Layout
+
+- `backend-dotnet-layer/`: ASP.NET Core Web API, Semantic Kernel integration, memory/retrieval services
+- `frontend-layer/`: React workshop UI
+- `docker-compose.yaml`: Redis support services for the workshop
+- `backend-dotnet-layer/Assets/ms-marco-MiniLM-L-6/`: local ONNX reranker assets
 
 ## 🎯 What You've Built
 
@@ -98,7 +134,7 @@ Your application now implements a comprehensive context engineering solution wit
 
 ### 7. **Semantic Caching** (Lab 9)
 - **Technique**: Vector Similarity Caching
-- **Implementation**: Redis LangCache with embedding-based matching
+- **Implementation**: RedisVL semantic cache with embedding-based matching
 - **Reference**: [Semantic Caching for LLMs](https://arxiv.org/html/2504.02268v1)
 - **Benefits**:
    - 40-60% reduction in LLM calls
@@ -108,20 +144,20 @@ Your application now implements a comprehensive context engineering solution wit
 ## 🔧 Technology Stack Mastered
 
 ### Core Technologies
-- **Java 21**: Modern Java with virtual threads and records
-- **Spring Boot 3.x**: Reactive programming with WebFlux
-- **LangChain4J**: Comprehensive LLM orchestration
+- **.NET 9 / ASP.NET Core**: Web API host and static-asset serving
+- **Semantic Kernel**: Chat orchestration and OpenAI integration
+- **React**: Workshop frontend
 
 ### AI/ML Components
-- **OpenAI GPT-3.5/4**: Large language model integration
-- **ONNX Runtime**: Cross-platform model inference
-- **Vector Embeddings**: Semantic similarity search
-- **MS MARCO**: State-of-the-art reranking models
+- **OpenAI chat models**: LLM responses and query compression
+- **ONNX reranking**: Local relevance scoring
+- **Vector search**: Semantic retrieval through the Agent Memory Server
+- **RedisVL**: Semantic router and semantic cache building blocks
 
 ### Infrastructure
-- **Docker**: Containerized deployment
-- **Redis Cloud**: Semantic caching via LangCache service
-- **Agent Memory Server**: Distributed memory management
+- **Docker Compose**: Redis support services
+- **Redis Agent Memory Server**: Working memory and long-term memory APIs
+- **Redis Insight**: Local inspection and debugging
 
 ## 🎓 Advanced Concepts Learned
 
@@ -138,17 +174,20 @@ Your application now implements a comprehensive context engineering solution wit
 ### Immediate Enhancements
 
 #### 1. **Implement Conversation Summarization**
-```java
-// Add conversation summary when token limit approached
-public String summarizeConversation(List<ChatMessage> messages) {
-    // Use LLM to create concise summary
-    // Store as long-term memory
-    // Clear short-term memory
+```csharp
+public Task<string> SummarizeConversationAsync(
+    IReadOnlyList<string> turns,
+    CancellationToken cancellationToken)
+{
+    // Use the chat model to create a compact summary
+    // Store the summary as long-term memory
+    // Trim or replace older short-term history
+    throw new NotImplementedException();
 }
 ```
 
 #### 2. **Add Multi-Modal Support**
-- Integrate image processing with LangChain4J
+- Integrate image processing with Semantic Kernel
 - Add support for PDF charts and diagrams
 - Implement audio transcription for voice queries
 
@@ -160,17 +199,20 @@ public String summarizeConversation(List<ChatMessage> messages) {
 ### Advanced Features
 
 #### 1. **Implement Agents and Tools**
-```java
-@Tool("Search the web for current information")
-public String webSearch(String query) {
-    // Integrate with search APIs
-    // Add to context dynamically
-}
+```csharp
+public sealed class AssistantTools
+{
+    [KernelFunction("search_web")]
+    public string SearchWeb(string query)
+    {
+        throw new NotImplementedException();
+    }
 
-@Tool("Execute calculations")
-public String calculate(String expression) {
-    // Math expression evaluation
-    // Return formatted results
+    [KernelFunction("calculate")]
+    public string Calculate(string expression)
+    {
+        throw new NotImplementedException();
+    }
 }
 ```
 
@@ -182,29 +224,28 @@ public String calculate(String expression) {
 ### Production Considerations
 
 #### 1. **RAG Observability and Monitoring**
-```java
-public class MyEmbeddingModelListener implements EmbeddingModelListener {
+```csharp
+public sealed class RetrievalDiagnostics
+{
+    private readonly ILogger<RetrievalDiagnostics> _logger;
 
-    @Override
-    public void onRequest(EmbeddingModelRequestContext requestContext) {
-        requestContext.attributes().put("startNanos", System.nanoTime());
+    public RetrievalDiagnostics(ILogger<RetrievalDiagnostics> logger)
+    {
+        _logger = logger;
     }
 
-    @Override
-    public void onResponse(EmbeddingModelResponseContext responseContext) {
-        long startNanos = (long) responseContext.attributes().get("startNanos");
-        long durationNanos = System.nanoTime() - startNanos;
-        // Do something with duration and/or responseContext.response()
-    }
-
-    @Override
-    public void onError(EmbeddingModelErrorContext errorContext) {
-        // Do something with errorContext.error()
+    public void LogRetrieval(string query, string route, int candidateCount)
+    {
+        _logger.LogInformation(
+            "Query '{Query}' routed to '{Route}' with {CandidateCount} candidates",
+            query,
+            route,
+            candidateCount);
     }
 }
 ```
 
-LangChain4J provides a comprehensive [observability framework](https://docs.langchain4j.dev/tutorials/observability) to monitor LLM and embedding model calls.
+Semantic Kernel and ASP.NET Core logging provide a straightforward place to instrument chat, retrieval, reranking, and cache activity.
 
 #### 2. **Security and Privacy**
 - Implement PII detection and masking
@@ -233,7 +274,7 @@ LangChain4J provides a comprehensive [observability framework](https://docs.lang
 ### Community and Contribution
 
 #### Join the Community
-- [LangChain4J Discord](https://discord.com/invite/JzTFvyjG6R)
+- [Semantic Kernel](https://github.com/microsoft/semantic-kernel)
 - [Redis Developer Community](https://discord.gg/redis)
 
 #### Contribute Back
@@ -256,8 +297,8 @@ You've demonstrated proficiency in:
 ## 🙏 Acknowledgments
 
 This workshop was made possible by:
-- The LangChain4J community
-- Redis Developer Relations team
+- the Semantic Kernel and ASP.NET Core communities
+- the Redis Developer Relations team
 - All workshop participants and contributors
 
 ## 📬 Feedback and Support
