@@ -1,6 +1,6 @@
 ## Context Engineering Workshop for .NET
 
-This repository contains the ASP.NET Core / Semantic Kernel version of the Context Engineering Workshop. The Java backend has been removed from this repo; the workshop is now organized around the dotnet implementation in `backend-dotnet-layer/`.
+This repository contains the ASP.NET Core / Semantic Kernel version of the Context Engineering Workshop. The workshop is organized around the dotnet implementation in `backend-dotnet-layer/`.
 
 `main` is the completed reference implementation. Participants should normally work through the lab branches instead of starting from `main`.
 
@@ -10,15 +10,15 @@ Each lab now has both a `starter` branch and a `solution` branch:
 
 | Lab | Starter | Solution | Focus |
 | --- | --- | --- | --- |
-| 1 | `lab-1-starter` | `lab-1-solution` | Base app setup |
-| 2 | `lab-2-starter` | `lab-2-solution` | Short-term memory |
-| 3 | `lab-3-starter` | `lab-3-solution` | PDF ingestion and knowledge-base storage |
-| 4 | `lab-4-starter` | `lab-4-solution` | Basic RAG with knowledge-base retrieval |
-| 5 | `lab-5-starter` | `lab-5-solution` | Long-term user memory retrieval |
-| 6 | `lab-6-starter` | `lab-6-solution` | Query compression and reranking |
-| 7 | `lab-7-starter` | `lab-7-solution` | Few-shot prompting |
-| 8 | `lab-8-starter` | `lab-8-solution` | Token-window management |
-| 9 | `lab-9-starter` | `lab-9-solution` | Semantic caching |
+| 1 | [`lab-1-starter`](https://github.com/slorello89/context-engineering-workshop-dotnet/tree/lab-1-starter) | [`lab-1-solution`](https://github.com/slorello89/context-engineering-workshop-dotnet/tree/lab-1-solution) | Base app setup |
+| 2 | [`lab-2-starter`](https://github.com/slorello89/context-engineering-workshop-dotnet/tree/lab-2-starter) | [`lab-2-solution`](https://github.com/slorello89/context-engineering-workshop-dotnet/tree/lab-2-solution) | Short-term memory |
+| 3 | [`lab-3-starter`](https://github.com/slorello89/context-engineering-workshop-dotnet/tree/lab-3-starter) | [`lab-3-solution`](https://github.com/slorello89/context-engineering-workshop-dotnet/tree/lab-3-solution) | PDF ingestion and knowledge-base storage |
+| 4 | [`lab-4-starter`](https://github.com/slorello89/context-engineering-workshop-dotnet/tree/lab-4-starter) | [`lab-4-solution`](https://github.com/slorello89/context-engineering-workshop-dotnet/tree/lab-4-solution) | Basic RAG with knowledge-base retrieval |
+| 5 | [`lab-5-starter`](https://github.com/slorello89/context-engineering-workshop-dotnet/tree/lab-5-starter) | [`lab-5-solution`](https://github.com/slorello89/context-engineering-workshop-dotnet/tree/lab-5-solution) | Long-term user memory retrieval |
+| 6 | [`lab-6-starter`](https://github.com/slorello89/context-engineering-workshop-dotnet/tree/lab-6-starter) | [`lab-6-solution`](https://github.com/slorello89/context-engineering-workshop-dotnet/tree/lab-6-solution) | Query compression and reranking |
+| 7 | [`lab-7-starter`](https://github.com/slorello89/context-engineering-workshop-dotnet/tree/lab-7-starter) | [`lab-7-solution`](https://github.com/slorello89/context-engineering-workshop-dotnet/tree/lab-7-solution) | Few-shot prompting |
+| 8 | [`lab-8-starter`](https://github.com/slorello89/context-engineering-workshop-dotnet/tree/lab-8-starter) | [`lab-8-solution`](https://github.com/slorello89/context-engineering-workshop-dotnet/tree/lab-8-solution) | Token-window management |
+| 9 | [`lab-9-starter`](https://github.com/slorello89/context-engineering-workshop-dotnet/tree/lab-9-starter) | [`lab-9-solution`](https://github.com/slorello89/context-engineering-workshop-dotnet/tree/lab-9-solution) | Semantic caching |
 
 How to use the branches:
 
