@@ -24,6 +24,10 @@ builder.Services.AddCors(options =>
 });
 builder.Services.Configure<OpenAiOptions>(builder.Configuration.GetSection(OpenAiOptions.SectionName));
 builder.Services.Configure<WorkingMemoryOptions>(builder.Configuration.GetSection(WorkingMemoryOptions.SectionName));
+builder.Services.Configure<MemoryOptions>(builder.Configuration.GetSection(MemoryOptions.SectionName));
+builder.Services.Configure<FilesProcessorOptions>(builder.Configuration.GetSection(FilesProcessorOptions.SectionName));
+builder.Services.Configure<SemanticRouterOptions>(builder.Configuration.GetSection(SemanticRouterOptions.SectionName));
+builder.Services.Configure<RerankingOptions>(builder.Configuration.GetSection(RerankingOptions.SectionName));
 
 var openAiOptions = builder.Configuration.GetSection(OpenAiOptions.SectionName).Get<OpenAiOptions>() ?? new OpenAiOptions();
 var openAiApiKey = string.IsNullOrWhiteSpace(openAiOptions.ApiKey)
@@ -39,7 +43,14 @@ if (!string.IsNullOrWhiteSpace(openAiApiKey))
 
 builder.Services.AddTransient(serviceProvider => new Kernel(serviceProvider));
 builder.Services.AddHttpClient<WorkingMemoryStore>();
+builder.Services.AddHttpClient<MemoryService>();
+builder.Services.AddHttpClient<OpenAiEmbeddingVectorizer>();
+builder.Services.AddSingleton<SemanticRoutingService>();
+builder.Services.AddSingleton<RerankingService>();
+builder.Services.AddTransient<RetrievalAugmentorService>();
 builder.Services.AddTransient<OpenAiChatService>();
+builder.Services.AddHostedService<FilesProcessor>();
+builder.Services.AddHostedService<SemanticRouterInitializationService>();
 
 var app = builder.Build();
 

@@ -35,3 +35,5 @@ backend-layer/.idea
 backend-layer/.env
 backend-layer/target
 frontend-layer/node_modules/
+backend-dotnet-layer/bin/
+backend-dotnet-layer/obj/
