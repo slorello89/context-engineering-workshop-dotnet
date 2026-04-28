@@ -16,6 +16,22 @@ dotnet run --project backend-dotnet-layer
 
 The repository now runs only the Redis support services through `docker-compose.yaml`. The .NET app runs separately on `http://localhost:8081` by default.
 
+## Lab Branches
+
+The workshop starter checkpoints now live on branch-per-lab snapshots:
+
+- `lab-1-starter`
+- `lab-2-starter`
+- `lab-3-starter`
+- `lab-4-starter`
+- `lab-5-starter`
+- `lab-6-starter`
+- `lab-7-starter`
+- `lab-8-starter`
+- `lab-9-starter`
+
+Each branch mirrors the Java workshop progression, adapted to the ASP.NET Core / Semantic Kernel version of the project. The completed reference implementation remains on `main`.
+
 ## 🎯 What You've Built
 
 ### Complete Context Engineering System
