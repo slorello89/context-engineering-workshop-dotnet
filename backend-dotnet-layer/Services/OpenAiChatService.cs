@@ -73,13 +73,12 @@ public sealed class OpenAiChatService
         """;
 
     private readonly IChatCompletionService? _chatCompletionService;
+    private readonly ChatHistoryWindowingService _chatHistoryWindowingService;
     private readonly Kernel _kernel;
     private readonly OpenAiOptions _options;
+    private readonly RetrievalAugmentorService _retrievalAugmentorService;
     private readonly WorkingMemoryOptions _workingMemoryOptions;
     private readonly WorkingMemoryStore _workingMemoryStore;
-    private readonly RetrievalAugmentorService _retrievalAugmentorService;
-    private readonly ChatHistoryWindowingService _chatHistoryWindowingService;
-    private readonly ResponseSemanticCacheService _responseSemanticCacheService;
 
     public OpenAiChatService(
         IOptions<OpenAiOptions> options,
@@ -88,7 +87,6 @@ public sealed class OpenAiChatService
         WorkingMemoryStore workingMemoryStore,
         RetrievalAugmentorService retrievalAugmentorService,
         ChatHistoryWindowingService chatHistoryWindowingService,
-        ResponseSemanticCacheService responseSemanticCacheService,
         IChatCompletionService? chatCompletionService = null)
     {
         _options = options.Value;
@@ -97,7 +95,6 @@ public sealed class OpenAiChatService
         _workingMemoryStore = workingMemoryStore;
         _retrievalAugmentorService = retrievalAugmentorService;
         _chatHistoryWindowingService = chatHistoryWindowingService;
-        _responseSemanticCacheService = responseSemanticCacheService;
         _chatCompletionService = chatCompletionService;
     }
 
@@ -125,18 +122,6 @@ public sealed class OpenAiChatService
             resolvedSessionId,
             _workingMemoryStore,
             cancellationToken);
-
-        var cachedResponse = await _responseSemanticCacheService.TryGetResponseAsync(
-            query,
-            resolvedSessionId,
-            cancellationToken);
-
-        if (!string.IsNullOrWhiteSpace(cachedResponse))
-        {
-            await workingMemoryChat.AddAsync(new ChatMessageContent(AuthorRole.User, query), cancellationToken);
-            await workingMemoryChat.AddAsync(new ChatMessageContent(AuthorRole.Assistant, cachedResponse), cancellationToken);
-            return cachedResponse;
-        }
 
         var augmentedUserMessage = await _retrievalAugmentorService.AugmentUserMessageAsync(
             query,
@@ -168,7 +153,6 @@ public sealed class OpenAiChatService
 
             await workingMemoryChat.AddAsync(new ChatMessageContent(AuthorRole.User, query), cancellationToken);
             await workingMemoryChat.AddAsync(new ChatMessageContent(AuthorRole.Assistant, content), cancellationToken);
-            await _responseSemanticCacheService.StoreResponseAsync(query, content, resolvedSessionId, cancellationToken);
             return content;
         }
         catch (Exception exception)
