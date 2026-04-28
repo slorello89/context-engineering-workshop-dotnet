@@ -76,6 +76,7 @@ public sealed class OpenAiChatService
     private readonly ChatHistoryWindowingService _chatHistoryWindowingService;
     private readonly Kernel _kernel;
     private readonly OpenAiOptions _options;
+    private readonly ResponseSemanticCacheService _responseSemanticCacheService;
     private readonly RetrievalAugmentorService _retrievalAugmentorService;
     private readonly WorkingMemoryOptions _workingMemoryOptions;
     private readonly WorkingMemoryStore _workingMemoryStore;
@@ -87,6 +88,7 @@ public sealed class OpenAiChatService
         WorkingMemoryStore workingMemoryStore,
         RetrievalAugmentorService retrievalAugmentorService,
         ChatHistoryWindowingService chatHistoryWindowingService,
+        ResponseSemanticCacheService responseSemanticCacheService,
         IChatCompletionService? chatCompletionService = null)
     {
         _options = options.Value;
@@ -95,6 +97,7 @@ public sealed class OpenAiChatService
         _workingMemoryStore = workingMemoryStore;
         _retrievalAugmentorService = retrievalAugmentorService;
         _chatHistoryWindowingService = chatHistoryWindowingService;
+        _responseSemanticCacheService = responseSemanticCacheService;
         _chatCompletionService = chatCompletionService;
     }
 
@@ -142,6 +145,7 @@ public sealed class OpenAiChatService
 
         try
         {
+            // TODO: Implement semantic caching with ResponseSemanticCacheService before calling OpenAI.
             var response = await _chatCompletionService.GetChatMessageContentAsync(
                 history,
                 executionSettings: executionSettings,
