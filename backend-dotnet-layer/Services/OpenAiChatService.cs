@@ -125,6 +125,7 @@ public sealed class OpenAiChatService
             resolvedSessionId,
             cancellationToken);
 
+        // TODO: Use ChatHistoryWindowingService to keep the prompt within a token budget.
         var history = workingMemoryChat.ToChatHistory(SystemPrompt);
         history.AddUserMessage(augmentedUserMessage);
 

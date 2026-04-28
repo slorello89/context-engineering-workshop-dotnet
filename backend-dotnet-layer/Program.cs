@@ -23,6 +23,7 @@ builder.Services.AddCors(options =>
     });
 });
 builder.Services.Configure<OpenAiOptions>(builder.Configuration.GetSection(OpenAiOptions.SectionName));
+builder.Services.Configure<ChatMemoryOptions>(builder.Configuration.GetSection(ChatMemoryOptions.SectionName));
 builder.Services.Configure<WorkingMemoryOptions>(builder.Configuration.GetSection(WorkingMemoryOptions.SectionName));
 builder.Services.Configure<MemoryOptions>(builder.Configuration.GetSection(MemoryOptions.SectionName));
 builder.Services.Configure<FilesProcessorOptions>(builder.Configuration.GetSection(FilesProcessorOptions.SectionName));
@@ -45,12 +46,12 @@ builder.Services.AddTransient(serviceProvider => new Kernel(serviceProvider));
 builder.Services.AddHttpClient<WorkingMemoryStore>();
 builder.Services.AddHttpClient<MemoryService>();
 builder.Services.AddHttpClient<OpenAiEmbeddingVectorizer>();
+builder.Services.AddSingleton<ChatHistoryWindowingService>();
 builder.Services.AddSingleton<SemanticRoutingService>();
 builder.Services.AddSingleton<RerankingService>();
 builder.Services.AddTransient<RetrievalAugmentorService>();
 builder.Services.AddTransient<OpenAiChatService>();
 builder.Services.AddHostedService<FilesProcessor>();
-builder.Services.AddHostedService<SemanticRouterInitializationService>();
 
 var app = builder.Build();
 
