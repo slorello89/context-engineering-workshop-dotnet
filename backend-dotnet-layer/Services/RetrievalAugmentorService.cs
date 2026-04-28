@@ -1,21 +1,10 @@
 using Microsoft.Extensions.Options;
-using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.ChatCompletion;
-using Microsoft.SemanticKernel.Connectors.OpenAI;
 using BackendDotnetLayer.Configuration;
 
 namespace BackendDotnetLayer.Services;
 
 public sealed class RetrievalAugmentorService
 {
-    private const string QueryCompressionPrompt = """
-        Rewrite the user's request into a short retrieval query for memory and knowledge-base search.
-        Keep only the core entities, concepts, and constraints.
-        Return only the rewritten query with no explanation.
-        """;
-
-    private readonly IChatCompletionService? _chatCompletionService;
-    private readonly Kernel _kernel;
     private readonly ILogger<RetrievalAugmentorService> _logger;
     private readonly MemoryService _memoryService;
     private readonly RerankingService _rerankingService;
@@ -23,21 +12,17 @@ public sealed class RetrievalAugmentorService
     private readonly WorkingMemoryOptions _workingMemoryOptions;
 
     public RetrievalAugmentorService(
-        Kernel kernel,
         ILogger<RetrievalAugmentorService> logger,
         MemoryService memoryService,
         RerankingService rerankingService,
         SemanticRoutingService semanticRoutingService,
-        IOptions<WorkingMemoryOptions> workingMemoryOptions,
-        IChatCompletionService? chatCompletionService = null)
+        IOptions<WorkingMemoryOptions> workingMemoryOptions)
     {
-        _kernel = kernel;
         _logger = logger;
         _memoryService = memoryService;
         _rerankingService = rerankingService;
         _semanticRoutingService = semanticRoutingService;
         _workingMemoryOptions = workingMemoryOptions.Value;
-        _chatCompletionService = chatCompletionService;
     }
 
     public async Task<string> AugmentUserMessageAsync(string userMessage, string? sessionId, CancellationToken cancellationToken)
@@ -76,36 +61,10 @@ public sealed class RetrievalAugmentorService
         return $"{userMessage}{Environment.NewLine}{Environment.NewLine}[Context]{Environment.NewLine}{contextBlock}";
     }
 
-    private async Task<string> CompressQueryAsync(string userMessage, CancellationToken cancellationToken)
+    private Task<string> CompressQueryAsync(string userMessage, CancellationToken cancellationToken)
     {
-        if (_chatCompletionService is null)
-        {
-            return userMessage;
-        }
-
-        try
-        {
-            var history = new ChatHistory();
-            history.AddSystemMessage(QueryCompressionPrompt);
-            history.AddUserMessage(userMessage);
-
-            var response = await _chatCompletionService.GetChatMessageContentAsync(
-                history,
-                executionSettings: new OpenAIPromptExecutionSettings
-                {
-                    Temperature = 0,
-                    MaxTokens = 80
-                },
-                kernel: _kernel,
-                cancellationToken: cancellationToken);
-
-            var compressed = response.Content?.Trim();
-            return string.IsNullOrWhiteSpace(compressed) ? userMessage : compressed;
-        }
-        catch
-        {
-            return userMessage;
-        }
+        // TODO: Implement query compression for retrieval. For now we use the raw user message.
+        return Task.FromResult(userMessage);
     }
 
     private async Task<List<RerankedContextItem>> RetrieveContextItemsAsync(

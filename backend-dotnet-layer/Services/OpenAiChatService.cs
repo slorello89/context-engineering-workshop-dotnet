@@ -27,24 +27,24 @@ public sealed class OpenAiChatService
 
     private readonly IChatCompletionService? _chatCompletionService;
     private readonly Kernel _kernel;
-    private readonly MemoryService _memoryService;
     private readonly OpenAiOptions _options;
+    private readonly RetrievalAugmentorService _retrievalAugmentorService;
     private readonly WorkingMemoryOptions _workingMemoryOptions;
     private readonly WorkingMemoryStore _workingMemoryStore;
 
     public OpenAiChatService(
         IOptions<OpenAiOptions> options,
         Kernel kernel,
+        RetrievalAugmentorService retrievalAugmentorService,
         IOptions<WorkingMemoryOptions> workingMemoryOptions,
         WorkingMemoryStore workingMemoryStore,
-        MemoryService memoryService,
         IChatCompletionService? chatCompletionService = null)
     {
         _options = options.Value;
         _kernel = kernel;
+        _retrievalAugmentorService = retrievalAugmentorService;
         _workingMemoryOptions = workingMemoryOptions.Value;
         _workingMemoryStore = workingMemoryStore;
-        _memoryService = memoryService;
         _chatCompletionService = chatCompletionService;
     }
 
@@ -73,11 +73,11 @@ public sealed class OpenAiChatService
             _workingMemoryStore,
             cancellationToken);
 
-        var userMemories = await _memoryService.SearchUserMemoriesAsync(resolvedSessionId, query, cancellationToken, 3);
-        var knowledgeMatches = await _memoryService.SearchKnowledgeBaseAsync(query, cancellationToken, 3);
-        var augmentedUserMessage = AppendContext(query, userMemories.Concat(knowledgeMatches).ToList());
-
         var history = workingMemoryChat.ToChatHistory(SystemPrompt);
+        var augmentedUserMessage = await _retrievalAugmentorService.AugmentUserMessageAsync(
+            query,
+            resolvedSessionId,
+            cancellationToken);
         history.AddUserMessage(augmentedUserMessage);
 
         var executionSettings = new OpenAIPromptExecutionSettings
@@ -105,21 +105,5 @@ public sealed class OpenAiChatService
         {
             throw new InvalidOperationException($"Semantic Kernel OpenAI request failed: {exception.Message}", exception);
         }
-    }
-
-    private static string AppendContext(string userMessage, IReadOnlyList<string> contextItems)
-    {
-        var items = contextItems
-            .Where(item => !string.IsNullOrWhiteSpace(item))
-            .Distinct(StringComparer.Ordinal)
-            .ToList();
-
-        if (items.Count == 0)
-        {
-            return userMessage;
-        }
-
-        var contextBlock = string.Join(Environment.NewLine, items.Select(item => $"- {item.Trim()}"));
-        return $"{userMessage}{Environment.NewLine}{Environment.NewLine}[Context]{Environment.NewLine}{contextBlock}";
     }
 }
