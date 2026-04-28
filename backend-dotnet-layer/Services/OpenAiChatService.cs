@@ -23,20 +23,14 @@ public sealed class OpenAiChatService
     private readonly IChatCompletionService? _chatCompletionService;
     private readonly Kernel _kernel;
     private readonly OpenAiOptions _options;
-    private readonly WorkingMemoryOptions _workingMemoryOptions;
-    private readonly WorkingMemoryStore _workingMemoryStore;
 
     public OpenAiChatService(
         IOptions<OpenAiOptions> options,
         Kernel kernel,
-        IOptions<WorkingMemoryOptions> workingMemoryOptions,
-        WorkingMemoryStore workingMemoryStore,
         IChatCompletionService? chatCompletionService = null)
     {
         _options = options.Value;
         _kernel = kernel;
-        _workingMemoryOptions = workingMemoryOptions.Value;
-        _workingMemoryStore = workingMemoryStore;
         _chatCompletionService = chatCompletionService;
     }
 
@@ -56,18 +50,9 @@ public sealed class OpenAiChatService
             throw new InvalidOperationException("Semantic Kernel OpenAI chat service is not configured.");
         }
 
-        var resolvedSessionId = string.IsNullOrWhiteSpace(sessionId)
-            ? _workingMemoryOptions.DefaultSessionId
-            : sessionId;
-
-        var workingMemoryChat = await WorkingMemoryChat.CreateAsync(
-            resolvedSessionId,
-            _workingMemoryStore,
-            cancellationToken);
-
-        await workingMemoryChat.AddAsync(new ChatMessageContent(AuthorRole.User, query), cancellationToken);
-
-        var history = workingMemoryChat.ToChatHistory(SystemPrompt);
+        var history = new ChatHistory();
+        history.AddSystemMessage(SystemPrompt);
+        history.AddUserMessage(query);
 
         var executionSettings = new OpenAIPromptExecutionSettings
         {
@@ -85,8 +70,6 @@ public sealed class OpenAiChatService
 
             var content = response.Content?.Trim()
                 ?? throw new InvalidOperationException("OpenAI response did not include assistant content.");
-
-            await workingMemoryChat.AddAsync(new ChatMessageContent(AuthorRole.Assistant, content), cancellationToken);
             return content;
         }
         catch (Exception exception)

@@ -54,37 +54,65 @@ AGENT_MEMORY_SERVER_URL=http://redis-agent-memory-server:8000
 docker compose up -d
 ```
 
-### Step 3: Review the Working Memory Store
+### Step 3: Review the Provided Support Classes
 
-Open `backend-dotnet-layer/Services/WorkingMemoryStore.cs` and review the code.
+Open these files and review the provided code:
 
-This class wraps the Redis Agent Memory Server working-memory REST APIs and is responsible for storing and retrieving chat messages.
+- `backend-dotnet-layer/Services/WorkingMemoryStore.cs`
+- `backend-dotnet-layer/Services/WorkingMemoryChat.cs`
+- `backend-dotnet-layer/Configuration/WorkingMemoryOptions.cs`
 
-### Step 4: Review the Working Memory Chat Adapter
+These are the support classes for the lab. Your task is to wire them into the application.
 
-Open `backend-dotnet-layer/Services/WorkingMemoryChat.cs` and review the code.
+### Step 4: Register the Working-memory Configuration
 
-This class loads chat history for a session, appends new messages, and writes the updated history back to the Agent Memory Server.
+Open `backend-dotnet-layer/Program.cs`.
 
-### Step 5: Review the Working Memory Configuration
+Add the working-memory options binding:
 
-Open `backend-dotnet-layer/Configuration/WorkingMemoryOptions.cs` and `backend-dotnet-layer/appsettings.json`.
+```csharp
+builder.Services.Configure<WorkingMemoryOptions>(
+    builder.Configuration.GetSection(WorkingMemoryOptions.SectionName));
+```
 
-Notice the values used for:
+### Step 5: Register the Working-memory HTTP Client
 
-- `AgentMemoryServerUrl`
-- `DefaultSessionId`
-- `Namespace`
-- `TimeToLiveInSeconds`
+Still in `Program.cs`, add the `WorkingMemoryStore` HTTP client:
 
-### Step 6: Rebuild and Run the Backend
+```csharp
+builder.Services.AddHttpClient<WorkingMemoryStore>();
+```
+
+### Step 6: Update `OpenAiChatService` to Use Working Memory
+
+Open `backend-dotnet-layer/Services/OpenAiChatService.cs`.
+
+Right now, the branch is still stateless:
+
+```csharp
+var history = new ChatHistory();
+history.AddSystemMessage(SystemPrompt);
+history.AddUserMessage(query);
+```
+
+Update the service so it:
+
+1. injects `WorkingMemoryOptions` and `WorkingMemoryStore`
+2. resolves the current session ID
+3. loads the existing history with `WorkingMemoryChat.CreateAsync(...)`
+4. stores the user message before the model call
+5. stores the assistant response after the model call
+
+The history construction should move from the stateless form above to `workingMemoryChat.ToChatHistory(SystemPrompt)`.
+
+### Step 7: Rebuild and Run the Backend
 
 ```bash
 dotnet build backend-dotnet-layer/BackendDotnetLayer.csproj
 dotnet run --project backend-dotnet-layer
 ```
 
-### Step 7: Keep the Frontend Running
+### Step 8: Keep the Frontend Running
 
 If you have not already built the frontend for this repo:
 

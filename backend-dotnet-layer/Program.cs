@@ -23,7 +23,6 @@ builder.Services.AddCors(options =>
     });
 });
 builder.Services.Configure<OpenAiOptions>(builder.Configuration.GetSection(OpenAiOptions.SectionName));
-builder.Services.Configure<WorkingMemoryOptions>(builder.Configuration.GetSection(WorkingMemoryOptions.SectionName));
 
 var openAiOptions = builder.Configuration.GetSection(OpenAiOptions.SectionName).Get<OpenAiOptions>() ?? new OpenAiOptions();
 var openAiApiKey = string.IsNullOrWhiteSpace(openAiOptions.ApiKey)
@@ -38,7 +37,6 @@ if (!string.IsNullOrWhiteSpace(openAiApiKey))
 }
 
 builder.Services.AddTransient(serviceProvider => new Kernel(serviceProvider));
-builder.Services.AddHttpClient<WorkingMemoryStore>();
 builder.Services.AddTransient<OpenAiChatService>();
 
 var app = builder.Build();
