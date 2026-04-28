@@ -72,14 +72,48 @@ The application already loads `FilesProcessorOptions` and `MemoryOptions`, but t
 
 Add the hosted service registration so the scanner starts with the application.
 
-### Step 6: Rebuild and Run the Backend
+### Step 6: Enable PDF Processing in `FilesProcessor`
+
+Open `backend-dotnet-layer/Services/FilesProcessor.cs`.
+
+The scanner currently finds PDF files but does not process them yet:
+
+```csharp
+// TODO: Enable document processing for each discovered PDF file.
+// await ProcessFileAsync(pdfPath, cancellationToken);
+```
+
+Uncomment that call so discovered files are processed.
+
+### Step 7: Implement Text Extraction and Chunk Splitting
+
+Still in `FilesProcessor.cs`, complete the two TODOs in `ProcessFileAsync(...)`.
+
+Change from:
+
+```csharp
+// TODO: Extract document text from the PDF file.
+var documentText = string.Empty;
+
+// TODO: Split the extracted text into knowledge-base segments.
+var segments = new List<string>();
+```
+
+To:
+
+```csharp
+var documentText = ExtractText(filePath);
+var segments = SplitIntoSegments(documentText);
+```
+
+### Step 8: Rebuild and Run the Backend
 
 ```bash
 dotnet build backend-dotnet-layer/BackendDotnetLayer.csproj
 dotnet run --project backend-dotnet-layer
 ```
 
-### Step 7: Monitor Document Processing
+### Step 9: Monitor Document Processing
 
 Watch the backend logs for PDF processing activity.
 

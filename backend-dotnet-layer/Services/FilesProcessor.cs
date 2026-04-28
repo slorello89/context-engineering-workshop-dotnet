@@ -48,6 +48,7 @@ public sealed class FilesProcessor : BackgroundService
 
     private async Task ScanForPdfFilesAsync(CancellationToken cancellationToken)
     {
+        await Task.CompletedTask;
         var inputDirectory = ResolveInputDirectory();
         if (string.IsNullOrWhiteSpace(inputDirectory) || !Directory.Exists(inputDirectory))
         {
@@ -56,24 +57,28 @@ public sealed class FilesProcessor : BackgroundService
 
         foreach (var pdfPath in Directory.EnumerateFiles(inputDirectory, "*.pdf", SearchOption.TopDirectoryOnly))
         {
-            await ProcessFileAsync(pdfPath, cancellationToken);
+            // TODO: Enable document processing for each discovered PDF file.
+            // await ProcessFileAsync(pdfPath, cancellationToken);
         }
     }
 
     private async Task ProcessFileAsync(string filePath, CancellationToken cancellationToken)
     {
+        await Task.CompletedTask;
         _logger.LogInformation("Processing file {FilePath}", filePath);
 
         try
         {
-            var documentText = ExtractText(filePath);
+            // TODO: Extract document text from the PDF file.
+            var documentText = string.Empty;
             if (string.IsNullOrWhiteSpace(documentText))
             {
                 _logger.LogWarning("Empty or unparseable document: {FileName}", Path.GetFileName(filePath));
                 return;
             }
 
-            var segments = SplitIntoSegments(documentText);
+            // TODO: Split the extracted text into knowledge-base segments.
+            var segments = new List<string>();
             if (segments.Count == 0)
             {
                 _logger.LogWarning("No segments created from document: {FileName}", Path.GetFileName(filePath));
