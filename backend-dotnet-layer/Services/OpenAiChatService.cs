@@ -17,59 +17,17 @@ public sealed class OpenAiChatService
         As for your specific instructions, The user will initiate a chat with you about a topic, and
         you will provide answers based on the user's query. To help you provide accurate answers, you will
         also be provided with context about the user. The context will be provided by a section starting
-        with [Context] — followed by a list of data points. The data points will be structured in two sections:
-        
-        - Chat memory: everything the user has said so far during the conversation. These are short-term,
-          temporary memories that are relevant only to the current session. They may contain details that
-          can be relevant to the potential answer you will provide.
-        
-        - User memories: This will be a list of memories that the user asked to be stored, explicitly.
-          They are long-term memories that persist across sessions. These memories may contain important
-          information about the user's preferences, habits, events, and other personal details.
+        with [Context] — followed by a list of data points. The data points may include short-term chat
+        memory, long-term user memories, or knowledge-base excerpts.
         
         IMPORTANT: You don't need to consider all data points while answering. Pick the ones that are
-        relevant to the user's query and discard the rest. The context must be used to provide accurate
-        answers. Often, the user is expecting you to consider only one data point from the context. Also,
-        even if the context includes other questions, your answer must be driven only by the user's query
-        only, always.
+        relevant to the user's query and discard the rest. The context must be used only when relevant.
         
         Also, make sure to:
         
         1. Keep your answer concise with three sentences top. Avoid listing items and bullet points.
         2. Use gender-neutral language - avoid terms like 'sir' or 'madam'.
         3. When talking about dates, use the format Month Day, Year (e.g., January 1, 2020).
-        
-        Few-shot examples:
-        
-        [Example 1 - Using only relevant context]
-        User: "What's my favorite color?"
-        Context: "Favorite color is black", "Enjoys coding in Java", "What day is today"
-        Response: "Your favorite color is black."
-        
-        [Example 2 - Ignoring irrelevant context]
-        User: "What programming language do I use?"
-        Context: "Favorite color is black", "Birthday is October 5th", Memory: "Enjoys coding in Java"
-        Response: "You enjoy coding in Java."
-        
-        [Example 3 - When asked about weather, ignore unrelated memories]
-        User: "How's the weather today?"
-        Context: Memory: "Favorite color is black", "Enjoys coding in Java"
-        Response: "I'd need to check current weather data to provide an accurate report. The memories available don't contain weather information."
-        
-        [Example 4 - When no relevant context is found]
-        User: "What is the capital of France?"
-        Context: "Enjoys coding in Java", Memory: "Favorite color is black"
-        Response: "The capital of France is Paris. This is general knowledge not requiring personal context."
-        
-        [Example 5 - Combining multiple relevant memories]
-        User: "Tell me about my work preferences"
-        Context: "Works as software engineer", "Favorite language is Java", "Prefers remote work", "Birthday October 5th"
-        Response: "You work as a software engineer with a preference for Java programming. You also prefer remote work arrangements."
-        
-        [Example 6 - Handling document knowledge]
-        User: "What does the document say about garage door codes?"
-        Context: Document: "The garage door code is 70170"
-        Response: "According to the document, the garage door code is 70170."
         """;
 
     private readonly IChatCompletionService? _chatCompletionService;
@@ -78,8 +36,6 @@ public sealed class OpenAiChatService
     private readonly WorkingMemoryOptions _workingMemoryOptions;
     private readonly WorkingMemoryStore _workingMemoryStore;
     private readonly RetrievalAugmentorService _retrievalAugmentorService;
-    private readonly ChatHistoryWindowingService _chatHistoryWindowingService;
-    private readonly ResponseSemanticCacheService _responseSemanticCacheService;
 
     public OpenAiChatService(
         IOptions<OpenAiOptions> options,
@@ -87,8 +43,6 @@ public sealed class OpenAiChatService
         IOptions<WorkingMemoryOptions> workingMemoryOptions,
         WorkingMemoryStore workingMemoryStore,
         RetrievalAugmentorService retrievalAugmentorService,
-        ChatHistoryWindowingService chatHistoryWindowingService,
-        ResponseSemanticCacheService responseSemanticCacheService,
         IChatCompletionService? chatCompletionService = null)
     {
         _options = options.Value;
@@ -96,8 +50,6 @@ public sealed class OpenAiChatService
         _workingMemoryOptions = workingMemoryOptions.Value;
         _workingMemoryStore = workingMemoryStore;
         _retrievalAugmentorService = retrievalAugmentorService;
-        _chatHistoryWindowingService = chatHistoryWindowingService;
-        _responseSemanticCacheService = responseSemanticCacheService;
         _chatCompletionService = chatCompletionService;
     }
 
@@ -126,27 +78,12 @@ public sealed class OpenAiChatService
             _workingMemoryStore,
             cancellationToken);
 
-        var cachedResponse = await _responseSemanticCacheService.TryGetResponseAsync(
-            query,
-            resolvedSessionId,
-            cancellationToken);
-
-        if (!string.IsNullOrWhiteSpace(cachedResponse))
-        {
-            await workingMemoryChat.AddAsync(new ChatMessageContent(AuthorRole.User, query), cancellationToken);
-            await workingMemoryChat.AddAsync(new ChatMessageContent(AuthorRole.Assistant, cachedResponse), cancellationToken);
-            return cachedResponse;
-        }
-
         var augmentedUserMessage = await _retrievalAugmentorService.AugmentUserMessageAsync(
             query,
             resolvedSessionId,
             cancellationToken);
 
-        var history = _chatHistoryWindowingService.BuildWindowedHistory(
-            SystemPrompt,
-            workingMemoryChat.Messages,
-            augmentedUserMessage);
+        var history = workingMemoryChat.ToChatHistory(SystemPrompt);
         history.AddUserMessage(augmentedUserMessage);
 
         var executionSettings = new OpenAIPromptExecutionSettings
@@ -168,7 +105,6 @@ public sealed class OpenAiChatService
 
             await workingMemoryChat.AddAsync(new ChatMessageContent(AuthorRole.User, query), cancellationToken);
             await workingMemoryChat.AddAsync(new ChatMessageContent(AuthorRole.Assistant, content), cancellationToken);
-            await _responseSemanticCacheService.StoreResponseAsync(query, content, resolvedSessionId, cancellationToken);
             return content;
         }
         catch (Exception exception)
