@@ -50,7 +50,6 @@ builder.Services.AddSingleton<RerankingService>();
 builder.Services.AddTransient<RetrievalAugmentorService>();
 builder.Services.AddTransient<OpenAiChatService>();
 builder.Services.AddHostedService<FilesProcessor>();
-builder.Services.AddHostedService<SemanticRouterInitializationService>();
 
 var app = builder.Build();
 
