@@ -34,7 +34,7 @@ public sealed class OpenAiChatService
         _chatCompletionService = chatCompletionService;
     }
 
-    public async Task<string> ChatAsync(string query, string? sessionId, CancellationToken cancellationToken)
+    public async Task<string> ChatAsync(string query, CancellationToken cancellationToken)
     {
         var apiKey = string.IsNullOrWhiteSpace(_options.ApiKey)
             ? Environment.GetEnvironmentVariable("OPENAI_API_KEY")

@@ -9,13 +9,6 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.SemanticKernel" Version="1.45.0" />
     <PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI" Version="1.45.0" />
-    <PackageReference Include="PdfPig" Version="0.1.14" />
-    <PackageReference Include="RedisVL" Version="0.0.2" />
-    <PackageReference Include="StackExchange.Redis" Version="2.10.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\redis-vl-dotnet\src\RedisVL.Rerankers.Onnx\RedisVL.Rerankers.Onnx.csproj" />
   </ItemGroup>
 
 </Project>
